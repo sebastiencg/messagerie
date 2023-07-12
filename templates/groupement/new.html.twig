@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Groupement{% endblock %}
+
+{% block body %}
+    <h1>Create new Groupement</h1>
+
+    {{ include('groupement/_form.html.twig') }}
+
+    <a href="{{ path('app_groupement_index') }}">back to list</a>
+{% endblock %}
