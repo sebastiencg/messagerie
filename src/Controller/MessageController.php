@@ -12,71 +12,54 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[Route('/message')]
+#[Route('/api/message')]
 class MessageController extends AbstractController
 {
     #[Route('/', name: 'app_message_index', methods: ['GET'])]
     public function index(MessageRepository $messageRepository): Response
     {
-        return $this->json([$messageRepository->findAll()],200);
+        return $this->json($messageRepository->findAll(),200,[],['groups'=>'message:read-one']);
 
     }
 
-    #[Route('/new', name: 'app_message_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    #[Route('/new', name: 'app_message_new', methods: [ 'POST'])]
+    public function new(Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
-        $message = new Message();
-        $form = $this->createForm(MessageType::class, $message);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $message->setAuthor($this->getUser());
-            $message->setCreatedAt(new \DateTimeImmutable());
-            $entityManager->persist($message);
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_message_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('message/new.html.twig', [
-            'message' => $message,
-            'form' => $form,
-        ]);
+        $json = $request->getContent();
+        $message = $serializer->deserialize($json,Message::class,'json');
+        $message->setCreatedAt(new \DateTimeImmutable());
+        $message->setAuthor($this->getUser());
+        $entityManager->persist($message);
+        $entityManager->flush();
+        return $this->json('bien envoyé');
     }
 
     #[Route('/{id}', name: 'app_message_show', methods: ['GET'])]
     public function show(Message $message): Response
     {
-        return $this->render('message/show.html.twig', [
-            'message' => $message,
-        ]);
+        return $this->json($message,200,[],['groups'=>'message:read-one']);
     }
 
-    #[Route('/{id}/edit', name: 'app_message_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Message $message, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_message_edit', methods: ['PUT'])]
+    public function edit(Request $request, Message $message, EntityManagerInterface $entityManager,SerializerInterface $serializer ): Response
     {
-        $form = $this->createForm(MessageType::class, $message);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_message_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('message/edit.html.twig', [
-            'message' => $message,
-            'form' => $form,
-        ]);
+        $json = $request->getContent();
+        $update = $serializer->deserialize($json,Message::class,'json');
+        $message->setContent($update->getContent());
+        $message->setAuthor($this->getUser());
+        $entityManager->persist($message);
+        $entityManager->flush();
+        return $this->json('bien modifié');
     }
 
-    #[Route('/{id}', name: 'app_message_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_message_delete', methods: ['DELETE'])]
     public function delete(Request $request, Message $message, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$message->getId(), $request->request->get('_token'))) {
+        if ($message) {
             $entityManager->remove($message);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_message_index', [], Response::HTTP_SEE_OTHER);
+        return $this->json('bien supprimé');
     }
 }

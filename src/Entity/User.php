@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -18,12 +19,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['message:read-one'])]
     private ?string $username = null;
 
     #[ORM\Column]
+    #[Groups(['message:read-one'])]
     private array $roles = [];
 
     /**
@@ -38,10 +42,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'master', targetEntity: Groupement::class)]
     private Collection $groupements;
 
+    #[ORM\OneToMany(mappedBy: 'ofUser1', targetEntity: Friend::class, orphanRemoval: true)]
+    private Collection $friends;
+
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->groupements = new ArrayCollection();
+        $this->friends = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,4 +182,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Friend>
+     */
+    public function getFriends(): Collection
+    {
+        return $this->friends;
+    }
+
+    public function addFriend(Friend $friend): static
+    {
+        if (!$this->friends->contains($friend)) {
+            $this->friends->add($friend);
+            $friend->setOfUser1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFriend(Friend $friend): static
+    {
+        if ($this->friends->removeElement($friend)) {
+            // set the owning side to null (unless already changed)
+            if ($friend->getOfUser1() === $this) {
+                $friend->setOfUser1(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
