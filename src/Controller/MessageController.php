@@ -44,19 +44,23 @@ class MessageController extends AbstractController
     #[Route('/{id}/edit', name: 'app_message_edit', methods: ['PUT'])]
     public function edit(Request $request, Message $message, EntityManagerInterface $entityManager,SerializerInterface $serializer ): Response
     {
-        $json = $request->getContent();
-        $update = $serializer->deserialize($json,Message::class,'json');
-        $message->setContent($update->getContent());
-        $message->setAuthor($this->getUser());
-        $entityManager->persist($message);
-        $entityManager->flush();
-        return $this->json('bien modifié');
+        if ($message->getAuthor() === $this->getUser()){
+            $json = $request->getContent();
+            $update = $serializer->deserialize($json,Message::class,'json');
+            $message->setContent($update->getContent());
+            $message->setAuthor($this->getUser());
+            $entityManager->persist($message);
+            $entityManager->flush();
+            return $this->json('bien modifié');
+        }
+        return $this->json('error');
+
     }
 
     #[Route('/{id}', name: 'app_message_delete', methods: ['DELETE'])]
     public function delete(Request $request, Message $message, EntityManagerInterface $entityManager): Response
     {
-        if ($message) {
+        if ($message->getAuthor() ===$this->getUser()) {
             $entityManager->remove($message);
             $entityManager->flush();
         }

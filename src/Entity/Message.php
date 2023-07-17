@@ -13,21 +13,21 @@ class Message
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['message:read-one'])]
+    #[Groups(['message:read-one','groupement:read-one'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['message:read-one'])]
+    #[Groups(['message:read-one','groupement:read-one'])]
 
     private ?string $content = null;
 
     #[ORM\Column]
-    #[Groups(['message:read-one'])]
+    #[Groups(['message:read-one','groupement:read-one'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['message:read-one'])]
+    #[Groups(['message:read-one','groupement:read-one'])]
 
     private ?User $author = null;
 

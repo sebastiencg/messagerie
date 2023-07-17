@@ -23,11 +23,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['message:read-one'])]
+    #[Groups(['message:read-one','groupement:read-all','groupement:read-one'])]
     private ?string $username = null;
 
     #[ORM\Column]
-    #[Groups(['message:read-one'])]
     private array $roles = [];
 
     /**
@@ -45,12 +44,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'ofUser1', targetEntity: Friend::class, orphanRemoval: true)]
     private Collection $friends;
 
+    #[ORM\OneToMany(mappedBy: 'member', targetEntity: Groupement::class)]
+    private Collection $groupementsMember;
+
+    #[ORM\OneToMany(mappedBy: 'ofUser', targetEntity: Validity::class)]
+    private Collection $validities;
+
 
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->groupements = new ArrayCollection();
         $this->friends = new ArrayCollection();
+        $this->groupementsMember = new ArrayCollection();
+        $this->validities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +214,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($friend->getOfUser1() === $this) {
                 $friend->setOfUser1(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Groupement>
+     */
+    public function getGroupementsMember(): Collection
+    {
+        return $this->groupementsMember;
+    }
+
+    public function addGroupementsMember(Groupement $groupementsMember): static
+    {
+        if (!$this->groupementsMember->contains($groupementsMember)) {
+            $this->groupementsMember->add($groupementsMember);
+            $groupementsMember->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupementsMember(Groupement $groupementsMember): static
+    {
+        if ($this->groupementsMember->removeElement($groupementsMember)) {
+            // set the owning side to null (unless already changed)
+            if ($groupementsMember->getMember() === $this) {
+                $groupementsMember->setMember(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Validity>
+     */
+    public function getValidities(): Collection
+    {
+        return $this->validities;
+    }
+
+    public function addValidity(Validity $validity): static
+    {
+        if (!$this->validities->contains($validity)) {
+            $this->validities->add($validity);
+            $validity->setOfUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeValidity(Validity $validity): static
+    {
+        if ($this->validities->removeElement($validity)) {
+            // set the owning side to null (unless already changed)
+            if ($validity->getOfUser() === $this) {
+                $validity->setOfUser(null);
             }
         }
 
