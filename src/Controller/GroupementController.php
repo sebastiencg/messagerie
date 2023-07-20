@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Groupement;
 use App\Entity\Message;
+use App\Entity\User;
 use App\Form\GroupementType;
 use App\Repository\GroupementRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +36,37 @@ class GroupementController extends AbstractController
         $entityManager->flush();
         return $this->json('groupe crée');
     }
+    #[Route('/number/new/{id}', name: 'app_groupement_new_number', methods: ['POST'])]
+    public function newNumber(Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Groupement $groupement): Response
+    {
+        $json = $request->getContent();
+        $user = $serializer->deserialize($json,User::class,'json');
+        $user=$userRepository->findOneBy(["username"=>$user->getUsername()]);
+        if($user){
+            $groupement->addNember($user);
+            $entityManager->persist($groupement);
+            $entityManager->flush();
+            return $this->json('membre ajouté');
+        }
 
+        return $this->json('error');
+    }
+
+    #[Route('/number/delete/{id}', name: 'app_groupement_delete_number', methods: ['POST'])]
+    public function deleteNumber(Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Groupement $groupement): Response
+    {
+        $json = $request->getContent();
+        $user = $serializer->deserialize($json,User::class,'json');
+        $user=$userRepository->findOneBy(["username"=>$user->getUsername()]);
+        if($user){
+            $groupement->removeNember($user);
+            $entityManager->persist($groupement);
+            $entityManager->flush();
+            return $this->json('membre sup');
+        }
+
+        return $this->json('error');
+    }
     #[Route('/{id}', name: 'app_groupement_show', methods: ['GET'])]
     public function show(Groupement $groupement): Response
     {

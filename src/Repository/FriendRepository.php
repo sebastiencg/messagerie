@@ -20,7 +20,27 @@ class FriendRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Friend::class);
     }
-
+    public function custom1($value1, $value2): array
+    {
+        return $this->createQueryBuilder('friend')
+            ->andWhere('friend.ofUser1 = :key1 AND friend.ofUser2 = :key2 OR friend.ofUser2 = :key1 AND friend.ofUser1 = :key2')
+            ->setParameter('key1', $value1)
+            ->setParameter('key2', $value2)
+            ->orderBy('friend.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+    public function custom2($value1): array
+    {
+        return $this->createQueryBuilder('friend')
+            ->andWhere('friend.ofUser1 = :key1 OR friend.ofUser2 = :key1')
+            ->setParameter('key1', $value1)
+            ->orderBy('friend.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 //    /**
 //     * @return Friend[] Returns an array of Friend objects
 //     */

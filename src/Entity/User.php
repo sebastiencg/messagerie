@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['message:read-one','groupement:read-all','groupement:read-one'])]
+    #[Groups(['message:read-one','groupement:read-all','groupement:read-one','friend:read-one'])]
     private ?string $username = null;
 
     #[ORM\Column]
@@ -44,11 +44,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'ofUser1', targetEntity: Friend::class, orphanRemoval: true)]
     private Collection $friends;
 
-    #[ORM\OneToMany(mappedBy: 'member', targetEntity: Groupement::class)]
-    private Collection $groupementsMember;
+
 
     #[ORM\OneToMany(mappedBy: 'ofUser', targetEntity: Validity::class)]
     private Collection $validities;
+
+    #[ORM\ManyToMany(targetEntity: Groupement::class, mappedBy: 'nember')]
+    private Collection $groupementsMember;
 
 
     public function __construct()

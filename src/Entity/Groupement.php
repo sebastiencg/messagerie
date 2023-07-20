@@ -28,12 +28,6 @@ class Groupement
 
     private Collection $messages;
 
-    #[ORM\ManyToOne(inversedBy: 'groupementsMember')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['groupement:read-all'])]
-
-    private ?User $member = null;
-
     #[ORM\Column(length: 255)]
     #[Groups(['groupement:read-one','groupement:read-all'])]
 
@@ -47,10 +41,16 @@ class Groupement
     #[ORM\OneToMany(mappedBy: 'groupe', targetEntity: Validity::class)]
     private Collection $validities;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'groupementsMember')]
+    #[Groups(['groupement:read-all'])]
+
+    private Collection $nember;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
         $this->validities = new ArrayCollection();
+        $this->nember = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,6 +162,30 @@ class Groupement
                 $validity->setGroupe(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getNember(): Collection
+    {
+        return $this->nember;
+    }
+
+    public function addNember(User $nember): static
+    {
+        if (!$this->nember->contains($nember)) {
+            $this->nember->add($nember);
+        }
+
+        return $this;
+    }
+
+    public function removeNember(User $nember): static
+    {
+        $this->nember->removeElement($nember);
 
         return $this;
     }

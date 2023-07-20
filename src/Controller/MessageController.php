@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Groupement;
 use App\Entity\Message;
+use App\Entity\User;
 use App\Form\MessageType;
+use App\Repository\GroupementRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,17 +25,33 @@ class MessageController extends AbstractController
 
     }
 
-    #[Route('/new', name: 'app_message_new', methods: [ 'POST'])]
-    public function new(Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    #[Route('/new/friend/{id}', name: 'app_message_new_friend', methods: [ 'POST'])]
+    public function newFriend(User $user,Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
-
         $json = $request->getContent();
         $message = $serializer->deserialize($json,Message::class,'json');
         $message->setCreatedAt(new \DateTimeImmutable());
         $message->setAuthor($this->getUser());
+        $message->setRecipient($user);
         $entityManager->persist($message);
         $entityManager->flush();
-        return $this->json('bien envoyé');
+        return $this->json('bien envoyé a '.$user->getUsername());
+    }
+    #[Route('/new/groupement/{id}', name: 'app_message_new_groupe', methods: [ 'POST'])]
+    public function newGroupement(Groupement$groupement,Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    {
+        if(in_array($this->getUser(),$groupement->getNember()->getValues())){
+            $json = $request->getContent();
+            $message = $serializer->deserialize($json,Message::class,'json');
+            $message->setCreatedAt(new \DateTimeImmutable());
+            $message->setAuthor($this->getUser());
+            $message->setGroupement($groupement);
+            $entityManager->persist($message);
+            $entityManager->flush();
+            return $this->json('bien envoyé aux groupe '. $groupement->getName());
+        }
+        return $this->json('error');
+
     }
 
     #[Route('/{id}', name: 'app_message_show', methods: ['GET'])]

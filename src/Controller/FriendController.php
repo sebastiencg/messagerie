@@ -20,50 +20,27 @@ class FriendController extends AbstractController
     #[Route('/', name: 'app_friend_index', methods: ['GET'])]
     public function index(FriendRepository $friendRepository): Response
     {
-        return $this->json($friendRepository->findBy([]),200,);
+        return $this->json($friendRepository->custom2($this->getUser()->getId()),200,[],['groups'=>'friend:read-one']);
 
     }
 
-    #[Route('/new/{id}', name: 'app_friend_new', methods: ['GET', 'POST'])]
-    public function new(Request $request,User $user,SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{id}', name: 'app_friend_new', methods: ['GET'])]
+    public function new(User $user, EntityManagerInterface $entityManager,FriendRepository $friendRepository): Response
     {
-        $json = $request->getContent();
-        $friend = $serializer->deserialize($json,Friend::class,'json');
+        ;
+        if ($friendRepository->custom1($this->getUser()->getId(),$user->getId())){
+            return $this->json('vous etes deja amis ou demande pas encore validé');
+        }
+        $friend = new Friend();
         $friend->setOfUser1($this->getUser());
         $friend->setOfUser2($user);
-        dd($friend);
+        $friend->setValidity(false);
         $entityManager->persist($friend);
         $entityManager->flush();
-        return $this->json('groupe crée');
+        return $this->json('demande d\' ami faite');
     }
 
-    #[Route('/{id}', name: 'app_friend_show', methods: ['GET'])]
-    public function show(Friend $friend): Response
-    {
-        return $this->render('friend/show.html.twig', [
-            'friend' => $friend,
-        ]);
-    }
-
-    #[Route('/{id}/edit', name: 'app_friend_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Friend $friend, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(FriendType::class, $friend);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_friend_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('friend/edit.html.twig', [
-            'friend' => $friend,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_friend_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_friend_delete', methods: ['DELETE'])]
     public function delete(Request $request, Friend $friend, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$friend->getId(), $request->request->get('_token'))) {
@@ -71,6 +48,6 @@ class FriendController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_friend_index', [], Response::HTTP_SEE_OTHER);
+        return $this->json(' ami sup');
     }
 }
