@@ -45,4 +45,15 @@ class MessageRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function custom1($value1, $value2): array
+    {
+        return $this->createQueryBuilder('message')
+            ->andWhere('message.author = :key1 AND message.recipient = :key2 OR message.recipient = :key1 AND message.author = :key2')
+            ->setParameter('key1', $value1)
+            ->setParameter('key2', $value2)
+            ->orderBy('message.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

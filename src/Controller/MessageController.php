@@ -55,16 +55,27 @@ class MessageController extends AbstractController
             $message->setGroupement($groupement);
             $entityManager->persist($message);
             $entityManager->flush();
-            return $this->json('bien envoyé aux groupe '. $groupement->getName());
+            return $this->json('bien envoyé aux groupe '. $groupement->getName(),200);
         }
         return $this->json('error');
 
     }
 
-    #[Route('/{id}', name: 'app_message_show', methods: ['GET'])]
-    public function show(Message $message): Response
+    #[Route('/friend/{id}', name: 'app_message_show_friend', methods: ['GET'])]
+    public function showFriend(User $user,MessageRepository $messageRepository): Response
     {
-        return $this->json($message,200,[],['groups'=>'message:read-one']);
+        $messages=$messageRepository->custom1($this->getUser()->getId(),$user->getId());
+
+        return $this->json($messages,200,[],['groups'=>'message:read-one']);
+    }
+    #[Route('/groupement/{id}', name: 'app_message_show_groupe', methods: ['GET'])]
+    public function showGroupe(Groupement $groupement): Response
+    {
+        if(in_array($this->getUser(),$groupement->getNember()->getValues())){
+
+            return $this->json($groupement->getMessages(),200,[],['groups'=>'message:read-one']);
+        }
+        return $this->json('error');
     }
 
     #[Route('/{id}/edit', name: 'app_message_edit', methods: ['PUT'])]
