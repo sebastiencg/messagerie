@@ -6,6 +6,7 @@ use App\Entity\Groupement;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Form\MessageType;
+use App\Repository\FriendRepository;
 use App\Repository\GroupementRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,16 +27,22 @@ class MessageController extends AbstractController
     }
 
     #[Route('/new/friend/{id}', name: 'app_message_new_friend', methods: [ 'POST'])]
-    public function newFriend(User $user,Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
+    public function newFriend(User $user,Request $request,FriendRepository $friendRepository,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
-        $json = $request->getContent();
-        $message = $serializer->deserialize($json,Message::class,'json');
-        $message->setCreatedAt(new \DateTimeImmutable());
-        $message->setAuthor($this->getUser());
-        $message->setRecipient($user);
-        $entityManager->persist($message);
-        $entityManager->flush();
-        return $this->json('bien envoyé a '.$user->getUsername());
+
+        $friend=$friendRepository->custom1($this->getUser()->getId(),$user->getId());
+        if($friend[0]->isValidity()){
+            $json = $request->getContent();
+            $message = $serializer->deserialize($json,Message::class,'json');
+            $message->setCreatedAt(new \DateTimeImmutable());
+            $message->setAuthor($this->getUser());
+            $message->setRecipient($user);
+            $entityManager->persist($message);
+            $entityManager->flush();
+            return $this->json('bien envoyé a '.$user->getUsername());
+        }
+        return $this->json('vous etes pas ami avec '.$user->getUsername());
+
     }
     #[Route('/new/groupement/{id}', name: 'app_message_new_groupe', methods: [ 'POST'])]
     public function newGroupement(Groupement$groupement,Request $request,EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
