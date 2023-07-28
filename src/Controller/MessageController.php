@@ -10,6 +10,7 @@ use App\Repository\FriendRepository;
 use App\Repository\GroupementRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +21,14 @@ use Symfony\Component\Serializer\SerializerInterface;
 class MessageController extends AbstractController
 {
     #[Route('/', name: 'app_message_index', methods: ['GET'])]
-    public function index(MessageRepository $messageRepository): Response
+    public function index(MessageRepository $messageRepository,PaginatorInterface $paginator,Request $request): Response
     {
-        return $this->json($messageRepository->findAll(),200,[],['groups'=>'message:read-one']);
+        $pagination = $paginator->paginate(
+            $messageRepository->findAll(), /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            20 /*limit per page*/
+        );
+        return $this->json($pagination,200,[],['groups'=>'message:read-one']);
 
     }
 
@@ -62,18 +68,26 @@ class MessageController extends AbstractController
     }
 
     #[Route('/friend/{id}', name: 'app_message_show_friend', methods: ['GET'])]
-    public function showFriend(User $user,MessageRepository $messageRepository): Response
+    public function showFriend(User $user,MessageRepository $messageRepository,PaginatorInterface $paginator,Request $request): Response
     {
-        $messages=$messageRepository->custom1($this->getUser()->getId(),$user->getId());
+        $pagination = $paginator->paginate(
+            $messageRepository->custom1($this->getUser()->getId(),$user->getId()), /* query NOT result */
+            $request->query->getInt('page', 1), /*page number*/
+            20 /*limit per page*/
+        );
 
-        return $this->json($messages,200,[],['groups'=>'message:read-one']);
+        return $this->json($pagination,200,[],['groups'=>'message:read-one']);
     }
     #[Route('/groupement/{id}', name: 'app_message_show_groupe', methods: ['GET'])]
-    public function showGroupe(Groupement $groupement): Response
+    public function showGroupe(Groupement $groupement,PaginatorInterface $paginator,Request $request): Response
     {
         if(in_array($this->getUser(),$groupement->getNember()->getValues())){
-
-            return $this->json($groupement->getMessages(),200,[],['groups'=>'message:read-one']);
+            $pagination = $paginator->paginate(
+                $groupement->getMessages(), /* query NOT result */
+                $request->query->getInt('page', 1), /*page number*/
+                20 /*limit per page*/
+            );
+            return $this->json($pagination,200,[],['groups'=>'message:read-one'],);
         }
         return $this->json('error');
     }

@@ -39,7 +39,31 @@ class FriendController extends AbstractController
         $entityManager->flush();
         return $this->json('demande d\' ami faite');
     }
+    #[Route('/request/', name: 'app_friend_request', methods: ['GET'])]
+    public function request(FriendRepository $friendRepository): Response
+    {
+        return $this->json($friendRepository->findBy(["ofUser2"=>$this->getUser(),"validity"=>false]),200,[],['groups'=>'friend:read-one']);
+    }
+    #[Route('/request/valid/{id}', name: 'app_friend_request_valid', methods: ['GET'])]
+    public function requestValid(User $user,FriendRepository $friendRepository): Response
+    {
+        $verification=$friendRepository->findOneBy(["ofUser1"=>$user,"ofUser2"=>$this->getUser(),"validity"=>false]);
+        if($verification){
+            $verification->setValidity(true);
+        }
 
+        return $this->json("accepté",200);
+    }
+    #[Route('/request/denied/{id}', name: 'app_friend_request_denied', methods: ['DELETE'])]
+    public function requestDenied(User $user,FriendRepository $friendRepository,EntityManagerInterface $entityManager): Response
+    {
+        $verification=$friendRepository->findOneBy(["ofUser1"=>$user,"ofUser2"=>$this->getUser(),"validity"=>false]);
+        if($verification){
+            $entityManager->remove($verification);
+            $entityManager->flush();        }
+
+        return $this->json("accepté",200);
+    }
     #[Route('/{id}', name: 'app_friend_delete', methods: ['DELETE'])]
     public function delete(Request $request, Friend $friend, EntityManagerInterface $entityManager): Response
     {

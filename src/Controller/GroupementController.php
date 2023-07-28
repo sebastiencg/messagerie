@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Groupement;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Entity\Validity;
 use App\Form\GroupementType;
 use App\Repository\GroupementRepository;
 use App\Repository\UserRepository;
@@ -37,16 +38,18 @@ class GroupementController extends AbstractController
         return $this->json('groupe crée');
     }
     #[Route('/number/new/{id}', name: 'app_groupement_new_number', methods: ['POST'])]
-    public function newNumber(Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Groupement $groupement): Response
+    public function newNumber(Validity $validity,Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Groupement $groupement): Response
     {
         $json = $request->getContent();
         $user = $serializer->deserialize($json,User::class,'json');
         $user=$userRepository->findOneBy(["username"=>$user->getUsername()]);
         if($user){
-            $groupement->addNember($user);
-            $entityManager->persist($groupement);
+            $validity->setGroupe($groupement);
+            $validity->setOfUser($user);
+            $validity->isValidity(false);
+            $entityManager->persist($validity);
             $entityManager->flush();
-            return $this->json('membre ajouté');
+            return $this->json('demande envoyer');
         }
 
         return $this->json('error');

@@ -26,7 +26,7 @@ class FriendRepository extends ServiceEntityRepository
             ->andWhere('friend.ofUser1 = :key1 AND friend.ofUser2 = :key2 OR friend.ofUser2 = :key1 AND friend.ofUser1 = :key2')
             ->setParameter('key1', $value1)
             ->setParameter('key2', $value2)
-            ->orderBy('friend.id', 'ASC')
+            ->orderBy('friend.id', 'DESC')
             ->getQuery()
             ->getResult()
             ;

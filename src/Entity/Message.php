@@ -41,6 +41,9 @@ class Message
 
     private ?Groupement $groupement = null;
 
+    #[ORM\OneToOne(mappedBy: 'message', cascade: ['persist', 'remove'])]
+    private ?Image $image = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +105,28 @@ class Message
     public function setGroupement(?Groupement $groupement): static
     {
         $this->groupement = $groupement;
+
+        return $this;
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Image $image): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($image === null && $this->image !== null) {
+            $this->image->setMessage(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($image !== null && $image->getMessage() !== $this) {
+            $image->setMessage($this);
+        }
+
+        $this->image = $image;
 
         return $this;
     }

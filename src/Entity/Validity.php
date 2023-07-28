@@ -19,6 +19,9 @@ class Validity
     #[ORM\ManyToOne(inversedBy: 'validities')]
     private ?Groupement $groupe = null;
 
+    #[ORM\Column]
+    private ?bool $validity = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Validity
     public function setGroupe(?Groupement $groupe): static
     {
         $this->groupe = $groupe;
+
+        return $this;
+    }
+
+    public function isValidity(): ?bool
+    {
+        return $this->validity;
+    }
+
+    public function setValidity(bool $validity): static
+    {
+        $this->validity = $validity;
 
         return $this;
     }
