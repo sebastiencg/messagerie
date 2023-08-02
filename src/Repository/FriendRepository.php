@@ -23,7 +23,7 @@ class FriendRepository extends ServiceEntityRepository
     public function custom1($value1, $value2): array
     {
         return $this->createQueryBuilder('friend')
-            ->andWhere('friend.ofUser1 = :key1 AND friend.ofUser2 = :key2 OR friend.ofUser2 = :key1 AND friend.ofUser1 = :key2')
+            ->andWhere('friend.ofUser1 = :key1 AND friend.ofUser2 = :key2 AND friend.validity = true OR friend.ofUser2 = :key1 AND friend.ofUser1 = :key2 AND friend.validity = true')
             ->setParameter('key1', $value1)
             ->setParameter('key2', $value2)
             ->orderBy('friend.id', 'DESC')
@@ -34,7 +34,7 @@ class FriendRepository extends ServiceEntityRepository
     public function custom2($value1): array
     {
         return $this->createQueryBuilder('friend')
-            ->andWhere('friend.ofUser1 = :key1 OR friend.ofUser2 = :key1')
+            ->andWhere('friend.ofUser1 = :key1 friend.validity = true OR friend.ofUser2 = :key1 friend.validity = true')
             ->setParameter('key1', $value1)
             ->orderBy('friend.id', 'ASC')
             ->getQuery()

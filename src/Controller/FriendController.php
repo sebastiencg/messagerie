@@ -67,11 +67,13 @@ class FriendController extends AbstractController
      Elle change la validité de la demande d'amitié enregistrée en base de données pour marquer la demande comme acceptée.
      * */
     #[Route('/request/valid/{id}', name: 'app_friend_request_valid', methods: ['GET'])]
-    public function requestValid(User $user,FriendRepository $friendRepository): Response
+    public function requestValid(User $user,FriendRepository $friendRepository, EntityManagerInterface $entityManager): Response
     {
         $verification=$friendRepository->findOneBy(["ofUser1"=>$user,"ofUser2"=>$this->getUser(),"validity"=>false]);
         if($verification){
             $verification->setValidity(true);
+            $entityManager->persist($verification);
+            $entityManager->flush();
         }
 
         return $this->json("accepté",200);
