@@ -52,15 +52,16 @@ Le groupement est enregistré en tant qu'entité Groupement dans la base de donn
      Le nouvel utilisateur est ajouté en tant qu'entité Validity dans la base de données.
      * */
     #[Route('/number/new/{id}', name: 'app_groupement_new_number', methods: ['POST'])]
-    public function newNumber(Validity $validity,Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Groupement $groupement): Response
+    public function newNumber(Groupement $groupement,Request $request,UserRepository $userRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer): Response
     {
         $json = $request->getContent();
         $user = $serializer->deserialize($json,User::class,'json');
         $user=$userRepository->findOneBy(["username"=>$user->getUsername()]);
         if($user){
+            $validity = new Validity();
             $validity->setGroupe($groupement);
             $validity->setOfUser($user);
-            $validity->isValidity(false);
+            $validity->setValidity(false);
             $entityManager->persist($validity);
             $entityManager->flush();
             return $this->json('demande envoyer');
