@@ -121,7 +121,7 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
 ### Gestion des Validités de Demande de Groupement
 
 22. **Obtenir la demande de groupement associée à l'utilisateur actuel**
-    - Route : `/api/groupement/validity/`
+    - Route : `/api/groupement/validity/show`
     - Méthode HTTP : GET
     - Description : Utilise le repository ValidityRepository pour récupérer la demande de groupement associée à l'utilisateur actuel (l'utilisateur connecté) et la renvoie au format JSON.
 
