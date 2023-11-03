@@ -1,7 +1,7 @@
 # Documentation de l'API
 
 L'API que vous avez développée propose plusieurs fonctionnalités pour gérer des amis, des groupements, des messages, et des demandes de groupement. Voici la description de chaque méthode exposée par votre API :
-
+## https://messagerie.api.miantsebastien.com/
 ### Gestion des Amis
 
 1. **Obtenir la liste d'amis d'un utilisateur**
