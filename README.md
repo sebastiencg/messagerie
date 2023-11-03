@@ -50,6 +50,10 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
    - Route : `/api/groupement/number/new/{id}`
    - Méthode HTTP : POST
    - Description : Permet à l'utilisateur actuel d'ajouter un nouveau membre (utilisateur) au groupement spécifié par son ID. Le nouvel utilisateur est ajouté en tant qu'entité "Validity" dans la base de données.
+   - Exemple de corps de requête au format JSON :
+     {
+    "username": "nom_utilisateur"
+}
 
 10. **Supprimer un membre du groupement**
     - Route : `/api/groupement/number/delete/{id}`
