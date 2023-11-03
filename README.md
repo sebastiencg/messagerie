@@ -154,5 +154,5 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Description : Description : Cette route permet à un utilisateur de demander le rafraîchissement de son jeton d'authentification. Les jetons d'authentification sont utilisés pour maintenir la session de l'utilisateur actif et sécurisée. Lorsqu'un utilisateur se connecte à l'application, il reçoit un jeton d'accès (access token) qui a une durée de validité limitée. Le jeton d'actualisation (refresh token) est utilisé pour obtenir un nouveau jeton d'accès une fois que le jeton actuel a expiré.
     - Exemple de corps de requête au format JSON :{"token": "token"}
    
-    26. **creer un utilisateur**
+27. **creer un utilisateur**
     - Route : `/register`
