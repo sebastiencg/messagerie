@@ -12,6 +12,7 @@ class Friend
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['friend:read-one'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'friends')]
