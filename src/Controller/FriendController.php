@@ -69,14 +69,23 @@ class FriendController extends AbstractController
     #[Route('/request/valid/{id}', name: 'app_friend_request_valid', methods: ['GET'])]
     public function requestValid(User $user,FriendRepository $friendRepository, EntityManagerInterface $entityManager): Response
     {
-        $verification=$friendRepository->findOneBy(["ofUser1"=>$user,"ofUser2"=>$this->getUser(),"validity"=>false]);
-        if($verification){
-            $verification->setValidity(true);
-            $entityManager->persist($verification);
+        $verification1=$friendRepository->findOneBy(["ofUser1"=>$user,"ofUser2"=>$this->getUser(),"validity"=>false]);
+        $verification2=$friendRepository->findOneBy(["ofUser1"=>$this->getUser(),"ofUser2"=>$user,"validity"=>false]);
+
+        if($verification1){
+            $verification1->setValidity(true);
+            $entityManager->persist($verification1);
             $entityManager->flush();
+            return $this->json("accepté",200);
+        }
+        if($verification2){
+            $verification1->setValidity(true);
+            $entityManager->persist($verification2);
+            $entityManager->flush();
+            return $this->json("accepté",200);
         }
 
-        return $this->json("accepté",200);
+        return $this->json("error",200);
     }
     /*Cette méthode est liée à la route /api/friend/request/denied/{id}, qui accepte uniquement les requêtes DELETE.
      Elle permet à l'utilisateur actuel de refuser une demande d'ami spécifique envoyée par un autre utilisateur (spécifié par son ID).
@@ -98,11 +107,12 @@ class FriendController extends AbstractController
     #[Route('/{id}', name: 'app_friend_delete', methods: ['DELETE'])]
     public function delete(Request $request, Friend $friend, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$friend->getId(), $request->request->get('_token'))) {
+        if ($friend->getOfUser1() === $this->getUser() || $friend->getOfUser2()=== $this->getUser()) {
             $entityManager->remove($friend);
             $entityManager->flush();
-        }
+            return $this->json(' ami sup');
 
-        return $this->json(' ami sup');
+        }
+        return $this->json(' error');
     }
 }

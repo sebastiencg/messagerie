@@ -31,7 +31,7 @@ class MessageController extends AbstractController
     public function index(MessageRepository $messageRepository,PaginatorInterface $paginator,Request $request): Response
     {
         $pagination = $paginator->paginate(
-            $messageRepository->findAll(), /* query NOT result */
+            $messageRepository->findBy(["author"=>$this->getUser()]), /* query NOT result */
             $request->query->getInt('page', 1), /*page number*/
             20 /*limit per page*/
         );
