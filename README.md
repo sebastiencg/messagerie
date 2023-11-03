@@ -1,7 +1,7 @@
 # Documentation de l'API
 
 L'API que vous avez développée propose plusieurs fonctionnalités pour gérer des amis, des groupements, des messages, et des demandes de groupement. Voici la description de chaque méthode exposée par votre API :
-
+## https://messagerie.api.miantsebastien.com/
 ### Gestion des Amis
 
 1. **Obtenir la liste d'amis d'un utilisateur**
@@ -45,6 +45,8 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
    - Route : `/api/groupement/new`
    - Méthode HTTP : POST
    - Description : Permet à l'utilisateur actuel de créer un nouveau groupement en fournissant les détails du groupement dans le corps de la requête au format JSON. Le groupement est enregistré en tant qu'entité "Groupement" dans la base de données.
+   - Exemple de corps de requête au format JSON :{"name": "nom_groupe"}
+
 
 9. **Ajouter un nouveau membre au groupement**
    - Route : `/api/groupement/number/new/{id}`
@@ -56,6 +58,7 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Route : `/api/groupement/number/delete/{id}`
     - Méthode HTTP : POST
     - Description : Permet à l'utilisateur actuel de supprimer un membre (utilisateur) du groupement spécifié par son ID. L'utilisateur est supprimé du groupement enregistré dans la base de données.
+   - Exemple de corps de requête au format JSON :{"username": "nom_utilisateur"}
 
 11. **Obtenir les détails d'un groupement spécifique**
     - Route : `/api/groupement/{id}`
@@ -66,6 +69,7 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Route : `/api/groupement/{id}/edit`
     - Méthode HTTP : PUT
     - Description : Permet à l'utilisateur actuel (le "maître" du groupement) de modifier les détails d'un groupement spécifique en fonction de son ID. Les modifications sont enregistrées dans la base de données.
+   - Exemple de corps de requête au format JSON :{"username": "nom_groupe"}
 
 13. **Supprimer un groupement**
     - Route : `/api/groupement/{id}`
@@ -90,6 +94,7 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Route : `/api/message/new/friend/{id}`
     - Méthode HTTP : POST
     - Description : Permet à l'utilisateur actuel d'envoyer un nouveau message à un ami spécifié par son ID. Avant d'envoyer le message, elle vérifie que les deux utilisateurs sont amis (en utilisant le FriendRepository). Si oui, elle crée un nouvel objet "Message", l'associe à l'auteur (l'utilisateur actuel) et au destinataire (ami spécifié), puis le persiste dans l'EntityManager.
+   - Exemple de corps de requête au format JSON :{"content": "coucou"}
 
 17. **Envoyer un message à
 
@@ -134,3 +139,20 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Route : `/api/groupement/validity/{id}`
     - Méthode HTTP : DELETE
     - Description : Permet à l'utilisateur actuel de refuser la demande de groupement spécifiée par son ID. Si l'utilisateur actuel est l'utilisateur associé à la demande de groupement, cette méthode supprime l'entité "Validity" associée à la demande de groupement.
+      
+### Gestion des utilisateurs
+
+25. **Obtenir un token (login)**
+    - Route : `/api/login_check`
+    - Méthode HTTP : POST
+    - Description : Cette route est utilisée pour authentifier un utilisateur en vérifiant les informations de connexion fournies. Lorsqu'un utilisateur tente de se connecter à l'application, les identifiants (nom d'utilisateur et mot de passe) sont envoyés au serveur via cette route. Le serveur vérifie ensuite ces informations par rapport à sa base de données d'utilisateurs.
+    - Exemple de corps de requête au format JSON :{"username": "username","password":"password"}
+
+26. **Obtenir un token rafraichi**
+    - Route : `/api/token/refresh`
+    - Méthode HTTP : POST
+    - Description : Description : Cette route permet à un utilisateur de demander le rafraîchissement de son jeton d'authentification. Les jetons d'authentification sont utilisés pour maintenir la session de l'utilisateur actif et sécurisée. Lorsqu'un utilisateur se connecte à l'application, il reçoit un jeton d'accès (access token) qui a une durée de validité limitée. Le jeton d'actualisation (refresh token) est utilisé pour obtenir un nouveau jeton d'accès une fois que le jeton actuel a expiré.
+    - Exemple de corps de requête au format JSON :{"token": "token"}
+   
+27. **creer un utilisateur**
+    - Route : `/register`
