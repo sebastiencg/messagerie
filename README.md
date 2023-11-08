@@ -96,7 +96,7 @@ L'API que vous avez développée propose plusieurs fonctionnalités pour gérer 
     - Description : Permet à l'utilisateur actuel d'envoyer un nouveau message à un ami spécifié par son ID. Avant d'envoyer le message, elle vérifie que les deux utilisateurs sont amis (en utilisant le FriendRepository). Si oui, elle crée un nouvel objet "Message", l'associe à l'auteur (l'utilisateur actuel) et au destinataire (ami spécifié), puis le persiste dans l'EntityManager.
    - Exemple de corps de requête au format JSON :{"content": "coucou"}
 
-17. **Envoyer un message à
+17. **Envoyer un message à un groupe**
 
  un groupement**
     - Route : `/api/message/new/groupement/{id}`
