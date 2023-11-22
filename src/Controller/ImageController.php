@@ -59,7 +59,7 @@ L'URL de l'image est générée en utilisant le UploaderHelper fourni par le bun
         $response = [
             "message"=>"bravo pour ton upload",
             "idImage"=>$image->getId(),
-            "image"=>"https://localhost:8000".$helper->asset($image)
+            "image"=>"https://messagerie.api.miantsebastien.com/".$helper->asset($image)
 
         ];
 
